@@ -1,0 +1,10 @@
+python -m torch.distributed.launch --nproc_per_node=1 main_hct_first.py --arch vit_small --data_path ../datasets/FC100\train\train --output_dir ../saving_dir
+python3 main_hct_first.py --arch vit_small --data_path ../datasets/FC100\train\train --output_dir ../saving_dir
+
+python -m torch.distributed.launch --nproc_per_node=1 main_hct_pooling.py --arch vit_small --data_path ../datasets/mini_imagenet/train --output_dir ../saving_dir --pretrained_weights /path/to/pretrained_weights
+
+
+python eval_hct_first.py --arch vit_small --server mini --partition test --checkpoint_key student --ckp_path /path/to/checkpoint_mini/ --num_shots 1
+
+
+python eval_hct_pooling.py --arch vit_small --server mini_pooling --partition val --checkpoint_key student --ckp_path /path/to/checkpoint_mini_pooling/  --pretrained_weights /path/to/pretrained_weights_of_first_satge --num_shots 5

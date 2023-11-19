@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "main_hct_first.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--arch", "vit_small", "--data_path", "../datasets/FC100", "--output_dir", "../saving_dir/pretrained_weights", "--epochs", "5", "--warmup_teacher_temp_epochs", "4", "--batch_size_per_gpu", "2", "--warmup_epochs", "5"]
+        },
+        {
+            "name": "main_hct_pooling.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--arch", "vit_small", "--data_path", "../datasets/FC100", "--output_dir", "../saving_dir/hct", "--epochs", "5", "--warmup_teacher_temp_epochs", "4", "--batch_size_per_gpu", "2", "--warmup_epochs", "5", "--pretrained_weights", "../saving_dir/pretrained_weights/checkpoint.pth"]
+        },
+    ]
+}

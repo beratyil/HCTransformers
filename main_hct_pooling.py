@@ -122,7 +122,7 @@ def get_args_parser():
 
 
 def train_dino(args):
-    utils.init_distributed_mode(args)
+    # utils.init_distributed_mode(args)
     utils.fix_random_seeds(args.seed)
     print("git:\n  {}\n".format(utils.get_sha()))
     print("\n".join("%s: %s" % (k, str(v)) for k, v in sorted(dict(vars(args)).items())))
@@ -135,10 +135,10 @@ def train_dino(args):
         args.local_crops_number,
     )
     dataset = datasets.ImageFolder(args.data_path, transform=transform)
-    sampler = torch.utils.data.DistributedSampler(dataset, shuffle=True)
+    # sampler = torch.utils.data.DistributedSampler(dataset, shuffle=True)
     data_loader = torch.utils.data.DataLoader(
         dataset,
-        sampler=sampler,
+        sampler=None,
         batch_size=args.batch_size_per_gpu,
         num_workers=args.num_workers,
         pin_memory=True,
@@ -218,15 +218,18 @@ def train_dino(args):
     student_392,student_196,teacher_392,teacher_196 = student_392.cuda(),student_196.cuda(),teacher_392.cuda(),teacher_196.cuda()
 
 
-    student = nn.parallel.DistributedDataParallel(student, device_ids=[args.gpu])
+    # student = nn.parallel.DistributedDataParallel(student, device_ids=[args.gpu])
 
-    student_392 = nn.parallel.DistributedDataParallel(student_392, device_ids=[args.gpu])
-    student_196 = nn.parallel.DistributedDataParallel(student_196, device_ids=[args.gpu])
+    # student_392 = nn.parallel.DistributedDataParallel(student_392, device_ids=[args.gpu])
+    # student_196 = nn.parallel.DistributedDataParallel(student_196, device_ids=[args.gpu])
 
     # teacher and student start with the same weights
-    teacher.load_state_dict(student.module.state_dict())
-    teacher_392.load_state_dict(student_392.module.state_dict())
-    teacher_196.load_state_dict(student_196.module.state_dict())
+    # teacher.load_state_dict(student.module.state_dict())
+    # teacher_392.load_state_dict(student_392.module.state_dict())
+    # teacher_196.load_state_dict(student_196.module.state_dict())
+    teacher.load_state_dict(student.state_dict())
+    teacher_392.load_state_dict(student_392.state_dict())
+    teacher_196.load_state_dict(student_196.state_dict())
 
     # there is no backpropagation through the teacher, so no need for gradients
     for p in student.parameters():
@@ -333,7 +336,7 @@ def train_dino(args):
     print("Starting DINO training !")
     for epoch in range(start_epoch, args.epochs):
 
-        data_loader.sampler.set_epoch(epoch)
+        # data_loader.sampler.set_epoch(epoch)
 
         # ============ training one epoch of DINO ... ============
         train_stats = train_one_epoch(student, teacher,student_392,teacher_392,student_196,teacher_196, dino_loss_392,dino_loss_196,surrogate_loss_392,surrogate_loss_392_2,surrogate_loss_196,surrogate_loss_196_2,
@@ -449,9 +452,9 @@ def train_one_epoch(student, teacher,student_392,teacher_392,student_196,teacher
         # EMA update for the teacher
         with torch.no_grad():
             m = momentum_schedule[it]  # momentum parameter
-            for param_q, param_k in zip(student_392.module.parameters(), teacher_392.parameters()):
+            for param_q, param_k in zip(student_392.parameters(), teacher_392.parameters()):
                 param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
-            for param_q, param_k in zip(student_196.module.parameters(), teacher_196.parameters()):
+            for param_q, param_k in zip(student_196.parameters(), teacher_196.parameters()):
                 param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
 
         # logging
@@ -534,8 +537,9 @@ class DINOLoss(nn.Module):
         Update center used for teacher output.
         """
         batch_center = torch.sum(teacher_output, dim=0, keepdim=True)
-        dist.all_reduce(batch_center)
-        batch_center = batch_center / (len(teacher_output) * dist.get_world_size())
+        # dist.all_reduce(batch_center)
+        # batch_center = batch_center / (len(teacher_output) * dist.get_world_size())
+        batch_center = batch_center / (len(teacher_output))
 
         # ema update
         self.center = self.center * self.center_momentum + batch_center * (1 - self.center_momentum)
