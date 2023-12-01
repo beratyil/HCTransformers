@@ -5,22 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "main_hct_first.py",
+            "name": "main_hct_first.py FER2013",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["--arch", "vit_small", "--data_path", "../datasets/FC100", "--output_dir", "../saving_dir/pretrained_weights", "--epochs", "5", "--warmup_teacher_temp_epochs", "4", "--batch_size_per_gpu", "2", "--warmup_epochs", "5"]
+            "args": ["--arch", "vit_small", "--data_path", "../datasets/FER2013/train", "--output_dir", "../saving_dir_fer2013/pretrained_weights_hct_first", "--epochs", "5", "--warmup_teacher_temp_epochs", "4", "--batch_size_per_gpu", "4", "--warmup_epochs", "5"]
         },
         {
-            "name": "main_hct_pooling.py",
+            "name": "main_hct_pooling.py FER2013",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["--arch", "vit_small", "--data_path", "../datasets/FC100", "--output_dir", "../saving_dir/hct", "--epochs", "5", "--warmup_teacher_temp_epochs", "4", "--batch_size_per_gpu", "2", "--warmup_epochs", "5", "--pretrained_weights", "../saving_dir/pretrained_weights/checkpoint.pth"]
+            "args": ["--arch", "vit_small", "--data_path", "../datasets/FER2013/train", "--output_dir", "../saving_dir_fer2013/pretrained_weights_hct", "--epochs", "5", "--warmup_teacher_temp_epochs", "4", "--batch_size_per_gpu", "4", "--warmup_epochs", "5", "--pretrained_weights", "../saving_dir_fer2023/pretrained_weights_hct_first/checkpoint.pth"]
+        },
+        {
+            "name": "eval_hct_first.py FER2013",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--server", "fer2013", "--partition", "test", "--checkpoint_key", "student", "--output_dir", "../saving_dir_fer2013/eval_hct_first_transformer", "--epochs", "5", "--batch_size_per_gpu", "2", "--pretrained_weights", "../saving_dir_fer2013/pretrained_weights_hct_first/checkpoint_first.pth"]
         },
     ]
 }

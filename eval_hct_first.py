@@ -8,11 +8,16 @@ from torchvision import datasets
 from torchvision import transforms as pth_transforms
 from torchvision import models as torchvision_models
 from testCos import testCos
+import sys
 
 import utils
 import vision_transformer_attn as vits
 
 server_dict = {
+    'fer2013':{
+        'dataset': 'fer2013',
+        'data_path': '../datasets/FER2013',     # Need to modify here
+        'ckp_path': '../saving_dir_fer2013/pretrained_weights_hct_first'},
     'mini':{
         'dataset': 'mini',
         'data_path': '/path/to/mini_imagenet/',     # Need to modify here
@@ -215,6 +220,6 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     # setup ckp_path
-    server_dict[args.server]['ckp_path'] = args.ckp_path
+    # server_dict[args.server]['ckp_path'] = args.ckp_path
     
     eval_linear(args)

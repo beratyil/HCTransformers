@@ -37,9 +37,12 @@ def feature_evaluation(cl_data_file, n_way=5, n_support=5, n_query=15, adaptatio
     for cl in select_class:
         img_feat = cl_data_file[cl]
         perm_ids = np.random.permutation(len(img_feat)).tolist()
-        z_all.append([np.squeeze(img_feat[perm_ids[i]]) for i in range(n_support + n_query)])  # stack each batch
+        # z_all.append([np.squeeze(img_feat[perm_ids[i]]) for i in range(n_support + n_query)])  # stack each batch
+        z_all.append([np.squeeze(img_feat[perm_ids[i]]) for i in range(len(img_feat))])  # stack each batch
 
-    z_all = torch.from_numpy(np.array(z_all))
+    z_temp = np.array(z_all)
+    a = 5
+    z_all = torch.from_numpy(z_temp)
     # If pooling, z_all can be evaluated by stages
     # z_all = torch.from_numpy(np.array(z_all))[:,:,:384] first stage / [:,:,384:768] second stage / [:,:,768:] third stage
     z_support, z_query = parse_feature(z_all, n_support)
