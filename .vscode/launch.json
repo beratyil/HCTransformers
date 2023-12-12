@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["--arch", "vit_small", "--data_path", "../datasets/FER2013/train", "--output_dir", "../saving_dir_fer2013/pretrained_weights_hct_first", "--epochs", "5", "--warmup_teacher_temp_epochs", "4", "--batch_size_per_gpu", "4", "--warmup_epochs", "5"]
+            "args": ["--arch", "vit_small", "--data_path", "../datasets/FER2013/train_improved", "--output_dir", "../saving_dir_fer2013/pretrained_weights_hct_first", "--epochs", "5", "--warmup_teacher_temp_epochs", "1", "--batch_size_per_gpu", "1", "--warmup_epochs", "5"]
         },
         {
             "name": "main_hct_pooling.py FER2013",
@@ -29,7 +29,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["--server", "fer2013", "--partition", "test", "--checkpoint_key", "student", "--output_dir", "../saving_dir_fer2013/eval_hct_first_transformer", "--epochs", "5", "--batch_size_per_gpu", "2", "--pretrained_weights", "../saving_dir_fer2013/pretrained_weights_hct_first/checkpoint_first.pth"]
+            "args": ["--server", "fer2013", "--partition", "test_improved", "--checkpoint_key", "student", "--output_dir", "../saving_dir_fer2013/eval_hct_first_transformer", "--epochs", "5", "--batch_size_per_gpu", "1", "--pretrained_weights", "../saving_dir_fer2013/pretrained_weights_hct_first/checkpoint_third_epoch2.pth", "--num_shots", "5"]
         },
     ]
 }

@@ -82,48 +82,23 @@ def eval_linear(args):
     # args.pretrained_weights = args.pretrained_weights[:-4] + str(args.epochs) + args.pretrained_weights[-4:]
 
     print(f"Model {args.arch} built.")
-    print(f"ckp_path: {server['ckp_path']}")
     
-    args.output_dir = server['ckp_path']
-
-    checkdir = os.listdir(server['ckp_path'])
-    checkdir.sort()
-    checkdir = [checkdir[i] for i in range(len(checkdir)) if '.pth' in checkdir[i]]
-    for i in range(len(checkdir)):
-        if str(args.epochs) in checkdir[i]:
-            if args.epochs != -1:
-                checkdir =  checkdir[i:] + checkdir[0:1]
-            else:
-                checkdir = checkdir[0:1] + checkdir[i:]
-            break
-    
-    checkdir = ['checkpoint0393.pth']
+    checkdir = server['ckp_path']
     print(f"checkpoints: {checkdir}")
 
-    # pretrained_weights = server['pretrained_weights']
-    # checkpoint_key = ['teacher','student']
+    print(f"Evaluating pretrained weight in {checkdir}")
+        
+    epoch = args.epochs
 
-    for i in range(len(checkdir)):
-        print(f"Evaluating pretrained weight in {checkdir[i]}")
-        if '.pth' in checkdir[i]:
-            args.pretrained_weights = os.path.join(server['ckp_path'],checkdir[i])
-            # server['pretrained_weights'] = pretrained_weights + checkdir[i]
-            
-            if not checkdir[i][-8:-4].isdigit():
-                epoch = int(torch.load(args.pretrained_weights)['epoch']) - 1
-            else:
-                epoch = int(checkdir[i][-8:-4])
+    outfile = os.path.join(server['ckp_path'],'{}_224_{}_{}.hdf5'.format(args.partition,epoch, args.checkpoint_key))
+    if not os.path.isfile(outfile) or args.isfile == 1:
+        utils.load_pretrained_weights(model, args.pretrained_weights, args.checkpoint_key, args.arch,
+                                    args.patch_size)
+        if args.save == 1:
+            save_features(model,server['dataset'], test_loader, 1, args.avgpool_patchtokens, epoch, server['ckp_path'],outfile)
 
-            outfile = os.path.join(server['ckp_path'],'{}_224_{}_{}.hdf5'.format(args.partition,epoch, args.checkpoint_key))
-            if not os.path.isfile(outfile) or args.isfile == 1:
-                utils.load_pretrained_weights(model, args.pretrained_weights, args.checkpoint_key, args.arch,
-                                              args.patch_size)
-                if args.save == 1:
-                    save_features(model,server['dataset'], test_loader, 1, args.avgpool_patchtokens, epoch, server['ckp_path'],outfile)
-
-            testCos(args,server,epoch,server['ckp_path'],outfile)
-        if int(args.epochs) == -1:
-            return
+    testCos(args,server,epoch,server['ckp_path'],outfile)
+        
 
 
 def save_features(model,dataset,loader, n, avgpool,epochs, pretrained_weights,outfile):

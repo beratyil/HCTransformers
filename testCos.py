@@ -37,12 +37,11 @@ def feature_evaluation(cl_data_file, n_way=5, n_support=5, n_query=15, adaptatio
     for cl in select_class:
         img_feat = cl_data_file[cl]
         perm_ids = np.random.permutation(len(img_feat)).tolist()
-        # z_all.append([np.squeeze(img_feat[perm_ids[i]]) for i in range(n_support + n_query)])  # stack each batch
-        z_all.append([np.squeeze(img_feat[perm_ids[i]]) for i in range(len(img_feat))])  # stack each batch
+        z_all.append([np.squeeze(img_feat[perm_ids[i]]) for i in range(n_support + n_query)])  # stack each batch
+        # z_all.append([np.squeeze(img_feat[perm_ids[i]]) for i in range(len(img_feat))])  # stack each batch
 
-    z_temp = np.array(z_all)
-    a = 5
-    z_all = torch.from_numpy(z_temp)
+    z_all = np.array(z_all)
+    z_all = torch.from_numpy(z_all)
     # If pooling, z_all can be evaluated by stages
     # z_all = torch.from_numpy(np.array(z_all))[:,:,:384] first stage / [:,:,384:768] second stage / [:,:,768:] third stage
     z_support, z_query = parse_feature(z_all, n_support)
@@ -90,7 +89,7 @@ def testCos(args,server,epoch,pretrained_weights,file=None):
     log_info = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
     log_info += '\n%d Test Acc at %d= %4.2f%% +- %4.2f%% %s\n' % (
-        epoch,iter_num, acc_mean1, 1.96 * acc_std1 / np.sqrt(iter_num), args.checkpoint_key)
+        int(epoch),iter_num, acc_mean1, 1.96 * acc_std1 / np.sqrt(iter_num), args.checkpoint_key)
     # basz step method dataset partition
     with open(os.path.join(pretrained_weights,'{}_log_{}_{}.txt'.format(args.partition,server['dataset'],args.checkpoint_key)), 'a+') as f:
         f.write(log_info)
